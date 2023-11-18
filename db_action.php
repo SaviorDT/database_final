@@ -1,15 +1,37 @@
 <?php
-$host = 'p:localhost';
-$user = 'root';
-$password = '';
-$database = 'database_final';
+require_once 'para_getter.php';
+require_once 'sql_action.php';
+require_once 'check.php';
 
-$link = new mysqli($host, $user, $password, $database);
+//checked while getting.
+$action_type = getActionType();
+$table = getTable();
 
-if(!$link) {
-	echo "{\"stat\":0,\"description\":\"資料庫連接錯誤\"}"
+switch($action_type) {
+	case 'delete':
+		$ID = getPost('ID');
+		deleteSQL($table, $ID);
+		break;
+	case 'insert':
+		$action_columns = getActionColumns();
+		$values = getValues();
+		
+		//if invalid, stop this script and echo error message.
+		checkColValid($table, $action_columns, []);
+		checkValValid($action_columns, $values);
+		
+		insertSQL($table, $action_columns, $values);
+		break;
+	case 'update':
+		$ID = getPost('ID');
+		$action_columns = getActionColumns();
+		$values = getValues();
+		
+		//if invalid, stop this script and echo error message.
+		checkColValid($table, $action_columns, []);
+		checkValValid($action_columns, $values);
+		
+		updateSQL($table, $ID, $action_columns, $values);
+		break;
 }
-
-
-$result->free();
 ?>
