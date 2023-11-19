@@ -75,6 +75,18 @@ function updateSQL($table, $ID, $columns, $values) {
 	}
 }
 
+function selectSQL($tables, $action_columns, $values, $para, $display_columns) {
+	//table and columns and values should be checked.
+	$select_command = getSelectCmd($table, $action_columns, $values, $para, $display_columns);
+	
+	$stmt = $GLOBALS['link']->prepare($select_command[0]);
+	call_user_func_array([$stmt, 'bind_param'], $select_command[1]);
+	$stmt->execute();
+	$result = $stmt->get_result();
+	
+	echo $result->fetch_all();
+}
+
 function inSQL($table, $column, $value) {
 	//table and column should be checked.
 	$stmt = $GLOBALS['link']->prepare("SELECT COUNT(*) AS cnt FROM ".$table." WHERE ".$column." = ?;");
@@ -153,6 +165,137 @@ function getUpdateCmd($table, $columns, $values) {
 	return $cmd;
 }
 
+function getSelectCmd($tables, $action_columns, $values, $para, $display_columns) {
+	$sql_str = "SELECT ";
+	$para_type_str = "";
+	$para_vals = [&$para_type_str];
+	
+	if(count($display_columns) == 0) {
+		$sql_str = "SELECT *, ";
+	}
+	foreach($display_columns as $column) {
+		$sql_str .= $column.", ";
+	}
+	
+	
+	$sql_str = substr($sql_str, 0, -2)." FROM ";
+	$tables = sortTable($tables);
+	$last_join_table = "";
+	foreach($tables as $table) {
+		switch($last_join_table) {
+			case "":
+				$sql_str .= $table." ";
+				break;
+			case "genres":
+				$sql_str .= "JOIN r_artists_genres USING (genres) ";
+				break;
+			case "audio_features":
+				$sql_str .= "JOIN audio_features ON audio_features_id = audio_feature_id ";
+				break;
+			default:
+				$sql_str .= "JOIN r_{$last_join_table}_{$table} USING({$last_join_table}_id) JOIN $table USING({$table}_id) ";
+			break;
+		}
+		$last_join_table = $table;
+	}
+	
+	if(count($action_columns) > 0) {
+		$sql_str .= "WHERE ";
+		for($i=0; $i<count(action_columns); $i++) {
+			$condition = analysisValue($action_columns[$i], $values[$i]);
+			$sql_str .= "$action_columns[$i] {$condition[0]} AND ";
+			$para_type_str .= $condition[1];
+			$para_vals = array_merge($para_vals, $condition[2]);
+		}
+		
+		$sql_str = substr($sql_str, 0, -4);
+	}
+	
+	if(array_key_exists('order', $para)) {
+		$sql_str .= "ORDER BY {$para['order']} ";
+		if($para['order_direction'] == 0) {
+			$sql_str .= "DESC ";
+		}
+	}
+	
+	$limit = (int)$para['limit'];
+	$offset = (int)$para['page'] * $limit;
+	$sql_str .= "LIMIT $limit OFFSET $offset;";
+	
+	return [$sql_str, $para_vals];
+}
+
+function sortTable($tables) {
+	$accept_tables = ['albums', 'tracks', 'artists', 'genres', 'audio_features'];
+	$to_ret = [];
+	foreach($accept_tables as $table) {
+		if(in_array($table, $tables)) {
+			$to_ret[] = $table;
+		}
+	}
+	
+	return $to_ret;
+}
+
+function analysisValue($column, $value) {
+	$int_columns = $GLOBALS['int_columns'];
+	$double_columns = $GLOBALS['double_columns'];
+	$date_columns = $GLOBALS['date_columns'];
+	$text_like_columns = $GLOBALS['text_like_columns'];
+	
+	$para_type = "";
+	$conditions = "";
+	$bind_param = [];
+	$range_para_types = "";
+	
+	if(in_array($column, $text_like_columns)) {
+		if($value[0] != "[" && $value[0] != "(") {
+			return ["LIKE ?", "s", [&$value]];
+		}
+	}
+	
+	if(in_array($column, $int_columns)) {
+		$para_type = "i";
+	}
+	if(in_array($column, $double_columns)) {
+		$para_type = "d";
+	}
+	if(in_array($column, $date_columns)) {
+		$para_type = "s";
+	}
+	
+	if($value[0] != "[" && $value[0] != "(") {
+		return ["= ?", $para_type, [&$value]];
+	}
+	
+	$value_list = explode(",", substr($value, 1, -1));
+	if($value_list[0] != "") {
+		$conditions = ">";
+		if($value[0] == "[") {
+			$conditions .= "=";
+		}
+		$conditions .= " ?";
+		$range_para_types .= $para_type;
+		$bind_param[] = &$value_list[0];
+	}
+	if($value_list[1] != "") {
+		if(count($bind_param) > 0) {
+			$conditions .= " AND $column ";
+		}
+		$conditions .= "<";
+		if($value[-1] == "]") {
+			$conditions .= "=";
+		}
+		$conditions .= " ?";
+		$range_para_types .= $para_type;
+		$bind_param [] = &$value_list[1];
+	}
+	
+	if(count($bind_param) == 0) {
+		returnException($column."傳入的範圍值為".$value."，請指定至少指定上限或下限其中之一");
+	}
+	return [$conditions, $range_para_types, $bind_param];
+}
 
 //$result->free();
 ?>
