@@ -62,11 +62,11 @@
             }
             else if(search_table == "artists"){
                 form.append("display_columns", '["artists_name", "albums_name", "release_date"]');
-                form.append("join", '["albums", "r_albums_artists", artists]');
+                form.append("join", '["albums", "r_albums_artists", "artists"]');
             }
             else{
                 form.append("display_columns", '["albums_name", "artists_name", "release_date"]');
-                form.append("join", '["albums", "r_albums_artists", artists]');
+                form.append("join", '["albums", "r_albums_artists", "artists"]');
             }
 
             let d_date;
@@ -93,9 +93,12 @@
             form.append("limit", document.getElementById("limit").value);
             form.append("order_direction", document.getElementsByTagName("order_direction").value);
 
-            console.log(form);
+            //console.log(form);
+            for (var pair of form.entries()) {
+                console.log(pair[0]+ ', ' + pair[1]); 
+            }
 
-            fetch("db_action.php", {
+            /*fetch("db_action.php", {
                 method: "POST",
                 body: form,
             })
@@ -105,7 +108,7 @@
             .then((txt) => {
                 console.log(txt);
                 //make_table(txt);
-            });
+            });*/
         })
     </script>
 </body>
