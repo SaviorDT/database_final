@@ -46,7 +46,7 @@ function checkValRangeValid($columns, $values) {
 	}
 	for($i=0; $i<count($columns); $i++) {
 		$value = $values[$i];
-		if(in_array($columns[$i], $GLOBALS['number_like_comlumns'])) {
+		if(in_array($columns[$i], $GLOBALS['number_like_columns'])) {
 			// start with [ or (, and then number, and then space or not, and then number, and then end with ) or ].
 			if(preg_match("/^[\[\(][-0-9.]*,[-0-9.]*[\]\)]$/i", $value)) { 
 				$value = explode(",", substr($values[$i], 1, -1));
@@ -151,22 +151,28 @@ function checkCanJoin($tables) {
 }
 
 function checkParaValid($para, $tables) {
+	$to_ret = [];
+	
 	if($para['limit'] != (int)$para['limit']) {
 		returnException("limit傳入值為: ".$para['limit']."，請輸入正整數");
 	}
 	if((int)$para['limit'] <= 0) {
 		returnException("limit傳入值為: ".$para['limit']."，請輸入大於0的數字");
 	}
+	$to_ret['limit'] = (int)$para['limit'];
+	
 	if($para['page'] != (int)$para['page']) {
 		returnException("page傳入值為: ".$para['page']."，請輸入正整數");
 	}
 	if((int)$para['page'] < 0) {
 		returnException("page傳入值為: ".$para['page']."，請輸入不小於0的數字");
 	}
+	$to_ret['page'] = (int)$para['page'];
+	
 	if($para['order'] == -1) {
 		unset($para['order']);
 		unset($para['order_direction']);
-		return;
+		return $to_ret;
 	}
 	
 	if($para['order_direction'] != 0 && $para['order_direction'] != 1) {
@@ -183,8 +189,9 @@ function checkParaValid($para, $tables) {
 		returnException("order傳入值為: ".$para['order']."，未找到此column，請確認是否輸入錯誤或是否join到");
 	}
 	
-	$para['limit'] = (int)$para['limit'];
-	$para['page'] = (int)$para['page'];
-	$para['order_direction'] = (int)$para['order_direction'];
+	$to_ret['order'] = $para['order'];
+	$to_ret['order_direction'] = (int)$para['order_direction'];
+	
+	return $to_ret;
 }
 ?>

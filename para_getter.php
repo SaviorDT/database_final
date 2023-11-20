@@ -4,7 +4,7 @@ require_once 'return_interface.php';
 
 function getPost($para_name, $default_value = null) {
 	if(!array_key_exists($para_name, $_POST)) {
-		if($default_value != null) {
+		if($default_value !== null) {
 			return $default_value;
 		}
 		returnException($para_name." not found!");
@@ -34,8 +34,8 @@ function getTable() {
 
 function getJoin() {
 	$json_join = getPost('join', "[]");
-	$join = json_decode($json_columns);
-	if(!$join) {
+	$join = json_decode($json_join);
+	if($join === null) {
 		returnException("join是錯誤JSON字串");
 	}
 	foreach($join as $table) {
@@ -49,18 +49,18 @@ function getJoin() {
 
 //DID NOT check valid.
 function getActionColumns($can_null = false) {
-	$json_columns = getPost('action_columns', "[]");
+	$json_columns = getPost('action_columns', $can_null ? "[]" : null);
 	$columns = json_decode($json_columns);
-	if(!$columns) {
+	if($columns === null) {
 		returnException("action_columns是錯誤JSON字串");
 	}
 	return $columns;
 }
 
 function getDisplayColumns() {
-	$json_columns = getPost('display_columns');
+	$json_columns = getPost('display_columns', "[]");
 	$columns = json_decode($json_columns);
-	if(!$columns) {
+	if(!$columns === null) {
 		returnException("display_columns是錯誤JSON字串");
 	}
 	return $columns;
@@ -68,9 +68,9 @@ function getDisplayColumns() {
 
 //DID NOT check valid.
 function getValues($can_null = false) {
-	$json_values = getPost('values', "[]");
+	$json_values = getPost('values', $can_null ? "[]" : null);
 	$values = json_decode($json_values);
-	if(!$values) {
+	if($values === null) {
 		returnException("values是錯誤JSON字串");
 	}
 	return $values;

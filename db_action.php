@@ -7,9 +7,6 @@ require_once 'check.php';
 $action_type = getActionType();
 $table = getTable();
 
-echo "123"[-1];
-exit();
-
 switch($action_type) {
 	case 'delete':
 		$ID = getPost('ID');
@@ -63,7 +60,7 @@ switch($action_type) {
 			'order' => $order,
 			'order_direction' => $order_direction
 		];
-		checkParaValid($para, $join);
+		$para = checkParaValid($para, $join);
 		
 		//echo in the function.
 		selectSQL($join, $action_columns, $values, $para, $display_columns);

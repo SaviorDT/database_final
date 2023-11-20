@@ -77,14 +77,24 @@ function updateSQL($table, $ID, $columns, $values) {
 
 function selectSQL($tables, $action_columns, $values, $para, $display_columns) {
 	//table and columns and values should be checked.
-	$select_command = getSelectCmd($table, $action_columns, $values, $para, $display_columns);
+	$select_command = getSelectCmd($tables, $action_columns, $values, $para, $display_columns);
 	
 	$stmt = $GLOBALS['link']->prepare($select_command[0]);
 	call_user_func_array([$stmt, 'bind_param'], $select_command[1]);
 	$stmt->execute();
 	$result = $stmt->get_result();
 	
-	echo $result->fetch_all();
+	$fst_row = $result->fetch_assoc();
+	mysqli_data_seek($result, 0);
+	$all_rows = $result->fetch_all();
+	
+	$to_ret = [
+		'stat' => 1,
+		'description' => array_keys($fst_row),
+		'rows' => $all_rows
+	];
+	
+	echo json_encode($to_ret);
 }
 
 function inSQL($table, $column, $value) {
@@ -201,11 +211,11 @@ function getSelectCmd($tables, $action_columns, $values, $para, $display_columns
 	
 	if(count($action_columns) > 0) {
 		$sql_str .= "WHERE ";
-		for($i=0; $i<count(action_columns); $i++) {
+		for($i=0; $i<count($action_columns); $i++) {
 			$condition = analysisValue($action_columns[$i], $values[$i]);
 			$sql_str .= "$action_columns[$i] {$condition[0]} AND ";
 			$para_type_str .= $condition[1];
-			$para_vals = array_merge($para_vals, $condition[2]);
+			$para_vals = my_array_merge($para_vals, $condition[2]);
 		}
 		
 		$sql_str = substr($sql_str, 0, -4);
@@ -223,6 +233,18 @@ function getSelectCmd($tables, $action_columns, $values, $para, $display_columns
 	$sql_str .= "LIMIT $limit OFFSET $offset;";
 	
 	return [$sql_str, $para_vals];
+}
+
+function my_array_merge($arr1, $arr2) {
+	$to_ret = [];
+	for($i=0; $i<count($arr1); $i++) {
+		$to_ret[] =& $arr1[$i];
+	}
+	for($i=0; $i<count($arr2); $i++) {
+		$to_ret[] =& $arr2[$i];
+	}
+	
+	return $to_ret;
 }
 
 function sortTable($tables) {
@@ -288,12 +310,13 @@ function analysisValue($column, $value) {
 		}
 		$conditions .= " ?";
 		$range_para_types .= $para_type;
-		$bind_param [] = &$value_list[1];
+		$bind_param[] = &$value_list[1];
 	}
 	
 	if(count($bind_param) == 0) {
 		returnException($column."傳入的範圍值為".$value."，請指定至少指定上限或下限其中之一");
 	}
+	
 	return [$conditions, $range_para_types, $bind_param];
 }
 
