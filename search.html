@@ -3,57 +3,109 @@
 <head>
 	<title>search</title>
     <script src="common.js"></script>
+    <script src="search_function.js"></script>
 	<meta charset="utf-8">
 </head>
 
 <body>
     <input type="button" name="index" value="回首頁" style="font-size: 20px" onclick="jump()"></input>
-    <table id="albumns">
-        <tr>
-            <td>名稱</td>
-            <td>單曲/專輯</td>
-            <td>釋出日期</td>
-            <td>詳細資料</td><!--<input type="button" onclick="view_full()" value="view"></input>-->
-            <td>刪除</td><!--<input type="button" onclick="delete_this()" value="delete"></input>-->
-        </tr>
-    </table>
+    <div id="search_holder">
+        <form>
+            <!--action_type = select-->
+            <label for="table">想找些什麼：</label>
+            <select id="table">
+                <option value="albums">專輯</option>
+                <option value="tracks">單曲</option>
+                <option value="artists">作者</option>
+            </select><br>
+
+            <l>搜尋條件：（不填就用默認值囉）</l><br><!--action_columns-->
+            <label for="name">名稱：</label><input type="text" name="name" id="name"></input><br>
+            <label for="release_date">日期：</label><input type="date" name="release_date" id="release_date"></input>
+            <span id="second_date"></span>
+            <select id="date_type" onchange="date_form()">
+                <option value="before">之前</option>
+                <option value="after">之後</option>
+                <option value="between">之間</option>
+            </select><br>
+
+            <label>排序方式：</label>
+            <select id="order">
+                <option value="name">名稱</option>
+                <option value="release_date">日期</option>
+                <option value="popularity">人氣</option>
+            </select><br>
+            <input type="radio" id="order_D" name="order_direction" value="1" required="required" checked/><label for="order_D">由小到大</label>
+		    <input type="radio" id="order_A" name="order_direction" value="0" required="required"/><label for="order_A">由大到小</label><br>
+            <label for="page" >頁面</label><input id="page" name="page" type="number" value="0" min="0" style="width: 50px"></input>
+            <label for="limit">每頁</label><input type="number" id="limit" name="limit" value="100" min="0" style="width: 50px"></input><label>筆</label><br>
+            <input id="trigger" type="button" name="search" value="查詢"></input>
+        </form>
+    </div><br>
+
+    <div id="tbl_holder">
+        查詢結果會在這顯示...
+        <table id="albums">
+        </table>
+    </div>
 
     <script>
-        var test_obj = [{albums_id:"123", albums_name: "test", albums_type:"single", release_date:"2023-11-20"}];
-
-        function view_full(){
-            window.open(encodeURI('./view_full.html?'+'targetID='+event.target.name));
-        }
-
-        function delete_this(e){
-            let ans = confirm("確定刪除此欄位？一但刪除便無法復原");
-            if(ans){
-                //delete
-                alert("刪除成功");
-                let delete_target = document.getElementById(e.name);
-                delete_target.remove();
+        document.getElementById("release_date").valueAsDate = new Date();
+        document.getElementById("trigger").addEventListener("click", function(event){
+            let form = new FormData();
+            let search_table = document.getElementById("table").value;
+            form.append("action_type", "select");
+            form.append("table", search_table);
+            if(search_table == "tracks"){
+                form.append("display_columns", '["tracks_name", "artists_name", "albums_name", "release_date"]');
+                form.append("join", '["tracks", "r_tracks_artists", "artists", "r_albums_tracks", "albums"]');
             }
-        }
+            else if(search_table == "artists"){
+                form.append("display_columns", '["artists_name", "albums_name", "release_date"]');
+                form.append("join", '["albums", "r_albums_artists", artists]');
+            }
+            else{
+                form.append("display_columns", '["albums_name", "artists_name", "release_date"]');
+                form.append("join", '["albums", "r_albums_artists", artists]');
+            }
 
-        function insert_newrow(albumn_obj){
-            let tbl = document.getElementById("albumns");
-            let new_row = tbl.insertRow(-1);
-            new_row.id = albumn_obj.albums_id;
-            let name = new_row.insertCell(-1);
-            let type = new_row.insertCell(-1);
-            let date = new_row.insertCell(-1);
-            let view_but = new_row.insertCell(-1);
-            let delete_but = new_row.insertCell(-1);
-            name.innerHTML = albumn_obj.albums_name;
-            type.innerHTML = albumn_obj.albums_type;
-            date.innerHTML = albumn_obj.release_date;
-            view_but.innerHTML = '<input type="button" name="'+albumn_obj.albums_id+'" onclick="view_full()" value="view"></input>';
-            delete_but.innerHTML = '<input type="button" name="'+albumn_obj.albums_id+'" onclick="delete_this(this)" value="delete"></input>';
-        }
+            let d_date;
+            let date_value = document.getElementById("release_date").value;
+            if(document.getElementById("date_type").value == "after"){
+                d_date = '["'+document.getElementById("release_date").value+'",]';
+            }
+            else if(document.getElementById("date_type").value == "between"){
+                let second_date = document.getElementById("second_date").value;
+                if(date_value > second_date){
+                    d_date = '["'+second_date+'", "'+date_value+'"]';
+                }
+                else{
+                    d_date = '["'+date_value+'", "'+second_date+'"]';
+                }
+            }
+            else{
+                d_date = '[,"'+document.getElementById("release_date").value+'"]';
+            }
+            form.append("action_columns", JSON.stringify('['+search_table+'_name, release_date]'));
+            form.append("values", JSON.stringify('['+document.getElementById("name").value+'", '+d_date+']'));
+            form.append("order", document.getElementById("order").value);
+            form.append("page", document.getElementById("page").value);
+            form.append("limit", document.getElementById("limit").value);
+            form.append("order_direction", document.getElementsByTagName("order_direction").value);
 
-        insert_newrow(test_obj[0]);
+            console.log(form);
 
+            /*fetch("db_action.php", {
+                method: "POST",
+                body: form,
+            })
+            .then((res) => {
+                return res.text();
+            })
+            .then((txt) => {
+                
+            });*/
+        })
     </script>
-    <!--form(key_word(null), )-->
 </body>
 </html>
