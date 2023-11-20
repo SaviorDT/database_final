@@ -95,7 +95,7 @@
 
             console.log(form);
 
-            /*fetch("db_action.php", {
+            fetch("db_action.php", {
                 method: "POST",
                 body: form,
             })
@@ -103,8 +103,9 @@
                 return res.text();
             })
             .then((txt) => {
-                
-            });*/
+                console.log(txt);
+                //make_table(txt);
+            });
         })
     </script>
 </body>

@@ -21,18 +21,11 @@ function date_form(){
     }
 }
 
-function insert_newrow(album_obj){
+function make_table(album_obj){
     let tbl = document.getElementById("albums");
     let new_row = tbl.insertRow(-1);
-    new_row.id = album_obj.albums_id;
-    let name = new_row.insertCell(-1);
-    let type = new_row.insertCell(-1);
-    let date = new_row.insertCell(-1);
     let view_but = new_row.insertCell(-1);
     let delete_but = new_row.insertCell(-1);
-    name.innerHTML = album_obj.albums_name;
-    type.innerHTML = album_obj.albums_type;
-    date.innerHTML = album_obj.release_date;
     view_but.innerHTML = '<input type="button" name="'+album_obj.albums_id+'" onclick="view_full()" value="view"></input>';
     delete_but.innerHTML = '<input type="button" name="'+album_obj.albums_id+'" onclick="delete_this(this)" value="delete"></input>';
 }
