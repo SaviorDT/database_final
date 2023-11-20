@@ -192,19 +192,21 @@ function getSelectCmd($tables, $action_columns, $values, $para, $display_columns
 	$tables = sortTable($tables);
 	$last_join_table = "";
 	foreach($tables as $table) {
-		switch($last_join_table) {
-			case "":
-				$sql_str .= $table." ";
+		if($last_join_table == "") {
+			$sql_str .= $table." ";
+		}
+		else {
+			switch($table) {
+				case "genres":
+					$sql_str .= "JOIN r_artists_genres USING (genres) ";
+					break;
+				case "audio_features":
+					$sql_str .= "JOIN audio_features ON audio_features_id = audio_feature_id ";
+					break;
+				default:
+					$sql_str .= "JOIN r_{$last_join_table}_{$table} USING({$last_join_table}_id) JOIN $table USING({$table}_id) ";
 				break;
-			case "genres":
-				$sql_str .= "JOIN r_artists_genres USING (genres) ";
-				break;
-			case "audio_features":
-				$sql_str .= "JOIN audio_features ON audio_features_id = audio_feature_id ";
-				break;
-			default:
-				$sql_str .= "JOIN r_{$last_join_table}_{$table} USING({$last_join_table}_id) JOIN $table USING({$table}_id) ";
-			break;
+			}
 		}
 		$last_join_table = $table;
 	}

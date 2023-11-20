@@ -60,7 +60,7 @@ function checkValRangeValid($columns, $values) {
 			}	
 		}
 		
-		if(in_array($columns[$i], $GLOBALS['text_like_comlumns'])) {
+		if(in_array($columns[$i], $GLOBALS['text_like_columns'])) {
 			return;
 		}
 		//if invalid, stop script and echo error message.
@@ -180,7 +180,7 @@ function checkParaValid($para, $tables) {
 	}
 	$in_table = false;
 	foreach($tables as $table) {
-		if(in_array($para['order'], $GLOBALS['table_columns'])) {
+		if(in_array($para['order'], $GLOBALS['table_columns'][$table])) {
 			$in_table = true;
 			break;
 		}

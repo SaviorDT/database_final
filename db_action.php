@@ -51,7 +51,7 @@ switch($action_type) {
 		}
 		
 		$limit = getPost('limit', 100);
-		$page = getPost('limit', 0);
+		$page = getPost('page', 0);
 		$order = getPost('order', -1);
 		$order_direction = getPost('order_direction', 0);
 		$para = [
