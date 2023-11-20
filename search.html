@@ -10,21 +10,49 @@
     <input type="button" name="index" value="回首頁" style="font-size: 20px" onclick="jump()"></input>
     <table id="albumns">
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>名稱</td>
+            <td>單曲/專輯</td>
+            <td>釋出日期</td>
             <td>詳細資料</td><!--<input type="button" onclick="view_full()" value="view"></input>-->
-            <td>刪除</td>
+            <td>刪除</td><!--<input type="button" onclick="delete_this()" value="delete"></input>-->
         </tr>
     </table>
 
-    <input type="button" name="0" onclick="view_full()" value="view"></input>
-    
-
     <script>
+        var test_obj = [{albums_id:"123", albums_name: "test", albums_type:"single", release_date:"2023-11-20"}];
+
         function view_full(){
             window.open(encodeURI('./view_full.html?'+'targetID='+event.target.name));
         }
+
+        function delete_this(e){
+            let ans = confirm("確定刪除此欄位？一但刪除便無法復原");
+            if(ans){
+                //delete
+                alert("刪除成功");
+                let delete_target = document.getElementById(e.name);
+                delete_target.remove();
+            }
+        }
+
+        function insert_newrow(albumn_obj){
+            let tbl = document.getElementById("albumns");
+            let new_row = tbl.insertRow(-1);
+            new_row.id = albumn_obj.albums_id;
+            let name = new_row.insertCell(-1);
+            let type = new_row.insertCell(-1);
+            let date = new_row.insertCell(-1);
+            let view_but = new_row.insertCell(-1);
+            let delete_but = new_row.insertCell(-1);
+            name.innerHTML = albumn_obj.albums_name;
+            type.innerHTML = albumn_obj.albums_type;
+            date.innerHTML = albumn_obj.release_date;
+            view_but.innerHTML = '<input type="button" name="'+albumn_obj.albums_id+'" onclick="view_full()" value="view"></input>';
+            delete_but.innerHTML = '<input type="button" name="'+albumn_obj.albums_id+'" onclick="delete_this(this)" value="delete"></input>';
+        }
+
+        insert_newrow(test_obj[0]);
+
     </script>
     <!--form(key_word(null), )-->
 </body>
