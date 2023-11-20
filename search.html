@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>search</title>
+    <script src="common.js"></script>
+	<meta charset="utf-8">
+</head>
+
+<body>
+    <input type="button" name="index" value="回首頁" style="font-size: 20px" onclick="jump()"></input>
+    <table id="albumns">
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>詳細資料</td><!--<input type="button" onclick="view_full()" value="view"></input>-->
+            <td>刪除</td>
+        </tr>
+    </table>
+
+    <input type="button" name="0" onclick="view_full()" value="view"></input>
+    
+
+    <script>
+        function view_full(){
+            window.open(encodeURI('./view_full.html?'+'targetID='+event.target.name));
+        }
+    </script>
+    <!--form(key_word(null), )-->
+</body>
+</html>
