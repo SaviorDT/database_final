@@ -92,6 +92,7 @@
                 form.append("action_columns", JSON.stringify([search_table+'_name', "release_date"]));
                 form.append("values", JSON.stringify([document.getElementById("name").value, d_date]));
             }
+            else if(search_table == "artists"){}//skip
             else{
                 form.append("action_columns", JSON.stringify(["release_date"]));
                 form.append("values", JSON.stringify([d_date]));
