@@ -21,22 +21,34 @@ function date_form(){
     }
 }
 function make_table(album_obj){
-    let tbl = document.getElementById("albums");
+    let tbl0 = document.getElementById("albums");
+    document.getElementById("tbl_holder").removeChild(tbl0);
+    let tbl = document.createElement("table");
+    tbl.id = "albums";
     //name first, then value
     let total_column = album_obj.description.length;
     let new_row = tbl.insertRow(-1);
-    for(let j=0;j<total_column;j++){
+    for(let j=1;j<total_column;j++){
         let new_cell = new_row.insertCell(-1);
         new_cell.innerHTML = album_obj.description[j];
     }
-    for(let i=0;i<total_column;i++){
-        for(let j=0;j<total_column;j++){
+    let view_but = new_row.insertCell(-1);
+    let delete_but = new_row.insertCell(-1);
+    view_but.innerHTML = "詳細資料";
+    delete_but.innerHTML = "刪除";
+
+    let row_length = album_obj.rows.length;
+    for(let i=0;i<row_length;i++){
+        let new_row = tbl.insertRow(-1);
+        new_row.id = album_obj.rows[i][0];
+        for(let j=1;j<total_column;j++){
             let new_cell = new_row.insertCell(-1);
-            new_cell.innerHTML = album_obj.rows[j];
+            new_cell.innerHTML = album_obj.rows[i][j];
         }
         let view_but = new_row.insertCell(-1);
         let delete_but = new_row.insertCell(-1);
-        view_but.innerHTML = '<input type="button" name="'+album_obj.albums_id+'" onclick="view_full()" value="view"></input>';
-        delete_but.innerHTML = '<input type="button" name="'+album_obj.albums_id+'" onclick="delete_this(this)" value="delete"></input>';
+        view_but.innerHTML = '<input type="button" name="'+album_obj.rows[i][0]+'" onclick="view_full(this)" value="view"></input>';
+        delete_but.innerHTML = '<input type="button" name="'+album_obj.rows[i][0]+'" onclick="delete_this(this)" value="delete"></input>';
     }
+    document.getElementById("tbl_holder").appendChild(tbl);
 }

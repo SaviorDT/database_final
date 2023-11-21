@@ -58,15 +58,15 @@
             form.append("action_type", "select");
             form.append("table", search_table);
             if(search_table == "tracks"){//不用r_系列
-                form.append("display_columns", '["tracks_name", "artists_name", "albums_name", "release_date"]');
+                form.append("display_columns", '["tracks_id","tracks_name", "artists_name", "albums_name", "release_date"]');
                 form.append("join", '["artists", "albums"]');
             }
             else if(search_table == "artists"){
-                form.append("display_columns", '["artists_name", "albums_name", "release_date"]');
+                form.append("display_columns", '["artists_id","artists_name", "albums_name", "release_date"]');
                 form.append("join", '["artists"]');
             }
             else{
-                form.append("display_columns", '["albums_name", "artists_name", "release_date"]');
+                form.append("display_columns", '["albums_id","ID","albums_name", "artists_name", "release_date"]');
                 form.append("join", '["artists"]');
             }
 
@@ -76,7 +76,7 @@
                 d_date = '['+date_value+',]';
             }
             else if(document.getElementById("date_type").value == "between"){
-                let second_date = document.getElementById("second_date").value;
+                let second_date = document.getElementById("s_date").value;
                 if(date_value > second_date){
                     d_date = '['+second_date+','+ date_value+']';
                 }
@@ -93,13 +93,15 @@
                 form.append("order", document.getElementById("order").value);
                 form.append("order_direction", document.getElementsByTagName("order_direction").value);
             }
-            form.append("page", document.getElementById("page").value);
-            form.append("limit", document.getElementById("limit").value);
+            form.append("page", Math.max(document.getElementById("page").value, 0));
+            form.append("limit", Math.max(document.getElementById("limit").value, 1));
 
             //console.log(form);
-            for (var pair of form.entries()) {
+            /*for (var pair of form.entries()) {
                 console.log(pair[0]+ ', ' + pair[1]); 
-            }
+            }*/
+            var test_txt = {"stat":1, "description":["id","albums_name", "artists_name", "release_date"], "rows":[["000","A", "art", "2023-11-21"],["001","B", "brt", "2023-11-20"]]};
+            make_table(test_txt);
 
             /*fetch("db_action.php", {
                 method: "POST",
