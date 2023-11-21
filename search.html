@@ -100,10 +100,10 @@
             /*for (var pair of form.entries()) {
                 console.log(pair[0]+ ', ' + pair[1]); 
             }*/
-            var test_txt = {"stat":1, "description":["id","albums_name", "artists_name", "release_date"], "rows":[["000","A", "art", "2023-11-21"],["001","B", "brt", "2023-11-20"]]};
-            make_table(test_txt);
+            //var test_txt = {"stat":1, "description":["id","albums_name", "artists_name", "release_date"], "rows":[["000","A", "art", "2023-11-21"],["001","B", "brt", "2023-11-20"]]};
+            //make_table(test_txt);
 
-            /*fetch("db_action.php", {
+            fetch("db_action.php", {
                 method: "POST",
                 body: form,
             })
@@ -112,8 +112,8 @@
             })
             .then((txt) => {
                 console.log(txt);
-                //make_table(txt);
-            });*/
+                make_table(txt);
+            });
         })
     </script>
 </body>
