@@ -105,12 +105,9 @@
             form.append("page", Math.max(document.getElementById("page").value, 0));
             form.append("limit", Math.max(document.getElementById("limit").value, 1));
 
-            //console.log(form);
-            /*for (var pair of form.entries()) {
-                console.log(pair[0]+ ', ' + pair[1]); 
-            }*/
             //var test_txt = {"stat":1, "description":["id","albums_name", "artists_name", "release_date"], "rows":[["000","A", "art", "2023-11-21"],["001","B", "brt", "2023-11-20"]]};
             //make_table(test_txt);
+            //check_form(form);
 
             fetch("db_action.php", {
                 method: "POST",

@@ -1,5 +1,5 @@
 function view_full(){
-    window.open(encodeURI('./view_full.html?'+'targetID='+event.target.name));
+    window.open(encodeURI('./view_full.html?'+event.target.className+'_id='+event.target.name));
 }
 
 function delete_this(e){
@@ -8,7 +8,21 @@ function delete_this(e){
         //delete
         alert("刪除成功");
         let delete_target = document.getElementById(e.name);
-        delete_target.remove();
+        let form = new FormData();
+        //fetch, if success->delete row
+        form.append("action_type", "delete");
+        form.append("table", e.target.className);
+        form.append(e.target.className+"_id", e.target.name);
+        fetch("db_action.php", {
+            method: "POST",
+            body: form,
+        })
+        .then((res) => {
+            return res.json();
+        })
+        .then((txt) => {
+            delete_target.remove();
+        });
     }
 }
 
@@ -47,8 +61,8 @@ function make_table(album_obj){
         }
         let view_but = new_row.insertCell(-1);
         let delete_but = new_row.insertCell(-1);
-        view_but.innerHTML = '<input type="button" name="'+album_obj.rows[i][0]+'" onclick="view_full(this)" value="view"></input>';
-        delete_but.innerHTML = '<input type="button" name="'+album_obj.rows[i][0]+'" onclick="delete_this(this)" value="delete"></input>';
+        view_but.innerHTML = '<input type="button" class="'+document.getElementById("table").value+'" name="'+album_obj.rows[i][0]+'" onclick="view_full(this)" value="view"></input>';
+        delete_but.innerHTML = '<input type="button" class="'+document.getElementById("table").value+'" name="'+album_obj.rows[i][0]+'" onclick="delete_this(this)" value="delete"></input>';
     }
     document.getElementById("tbl_holder").appendChild(tbl);
 }
