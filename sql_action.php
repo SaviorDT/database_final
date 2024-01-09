@@ -91,7 +91,8 @@ function selectSQL($tables, $action_columns, $values, $para, $display_columns) {
 	$to_ret = [
 		'stat' => 1,
 		'description' => array_keys($fst_row),
-		'rows' => $all_rows
+		'rows' => $all_rows,
+		'command' => $select_command[0]
 	];
 	
 	echo json_encode($to_ret);
@@ -273,7 +274,10 @@ function analysisValue($column, $value) {
 	$range_para_types = "";
 	
 	if(in_array($column, $text_like_columns)) {
-		if($value[0] != "[" && $value[0] != "(") {
+		if(strlen($value) > 0 && $value[0] != "[" && $value[0] != "(") {
+			return ["LIKE ?", "s", [&$value]];
+		}
+		if(strlen($value) == 0) {
 			return ["LIKE ?", "s", [&$value]];
 		}
 	}

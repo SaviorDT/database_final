@@ -4,6 +4,7 @@
 	<title>search</title>
     <script src="common.js"></script>
     <script src="search_function.js"></script>
+    <script src="savior_dt_js_lib/suggest_input.js"></script>
 	<meta charset="utf-8">
 </head>
 
@@ -20,7 +21,7 @@
             </select><br>
 
             <l>搜尋條件：（不填就用默認值囉）</l><br><!--action_columns-->
-            <label for="name">名稱：</label><input type="text" name="name" id="name"></input><br>
+            <label for="name">名稱：</label><input type="text" name="name" id="name" list="name_data_list"></input><datalist id="name_data_list"></datalist><br>
             <label for="release_date">日期：</label><input type="date" name="release_date" id="release_date"></input>
             <span id="second_date"></span>
             <select id="date_type" onchange="date_form()">
@@ -51,6 +52,8 @@
     </div>
 
     <script>
+        autoUpdateSuggest(document.getElementById('name'), document.getElementById('name_data_list'), 'albums', 'albums_name');
+
         document.getElementById("release_date").valueAsDate = new Date();
         document.getElementById("trigger").addEventListener("click", function(event){
             let form = new FormData();
@@ -100,7 +103,7 @@
 
             if(document.getElementById("order").value != "0"){
                 form.append("order", document.getElementById("order").value);
-                form.append("order_direction", document.getElementsByTagName("order_direction").value);
+                form.append("order_direction", document.querySelector('form')['order_direction'].value);
             }
             form.append("page", Math.max(document.getElementById("page").value, 0));
             form.append("limit", Math.max(document.getElementById("limit").value, 1));
