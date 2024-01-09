@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>search</title>
+    <script src="common.js"></script>
+    <script src="search_function.js"></script>
+    <script src="savior_dt_js_lib/suggest_input.js"></script>
+	<meta charset="utf-8">
+</head>
+
+<body>
+    <input type="button" name="index" value="回首頁" style="font-size: 20px" onclick="jump()"></input>
+    <div id="search_holder">
+        <form>
+            <!--action_type = select-->
+            <label for="table">想找些什麼：</label>
+            <select id="table">
+                <!--<option value="albums">專輯</option>-->
+                <option value="tracks">單曲</option>
+                <!--<option value="artists">作者</option>-->
+            </select><br>
+
+            <l>搜尋條件：（不填就用默認值囉）</l><br><!--action_columns-->
+            <label for="name">單曲名稱：</label><input type="text" name="name" id="name" list="name_data_list"></input><datalist id="name_data_list"></datalist><br><!--tracks_name-->
+            <label for="disc_number_min">專輯中第幾號（0~127）：</label><input type="number", name="disc_number_min" id="disc_number_min" value="1" min="1" max="127"></input>
+            <label for="disc_number_max">~ </label><input type="number", name="disc_number_max" id="disc_number_max" value="1" min="1" max="127"></input><br>
+            <label for="track_number_min">專輯中單曲數（0~32767）：</label><input type="number", name="track_number_min" id="track_number_min" value="1" min="1" max="32767"></input>
+            <label for="track_number_max">~ </label><input type="number", name="track_number_max" id="track_number_max" value="1" min="1" max="32767"></input><br>
+            <label for="disc_duration_min">專輯長度（秒）：</label><input type="number", name="disc_duration_min" id="disc_duration_min" value="0" min="0" max="1e23-1"></input>
+            <label for="disc_duration_max">~ </label><input type="number", name="disc_duration_max" id="disc_duration_max" value="180" min="0" max="1e23-1"></input><br>
+            <label for="explicit_lyrics">是否有露骨、暴力歌詞：</label>
+                <input type="radio" id="explicit" name="explicit_lyrics" value="1" required="required" checked/><label for="explicit">是</label>
+		        <input type="radio" id="no_explicit" name="explicit_lyrics" value="0" required="required"/><label for="no_explicit">否</label><br>
+            <label for="tracks_popularity_min">人氣指數（0~100）：</label><input type="number", name="tracks_popularity_min" id="tracks_popularity_min" value="0" min="0" max="100"></input>
+            <label for="tracks_popularity_max">~：</label><input type="number", name="tracks_popularity_max" id="tracks_popularity_max" value="100" min="0" max="100"></input><br>
+            <label for="is_playable">是否還能播放：</label>
+                <input type="radio" id="playable" name="is_playable" value="1" required="required" checked/><label for="is_playable">是</label>
+		        <input type="radio" id="not_playable" name="is_playable" value="0" required="required"/><label for="is_playable">否</label><br>
+
+            <label>排序方式：</label>
+            <select id="order">
+                <option value="0">無</option>
+                <option value="name">名稱</option>
+                <option value="release_date">日期</option>
+                <option value="popularity">人氣</option>
+            </select><br>
+            <input type="radio" id="order_D" name="order_direction" value="1" required="required" checked/><label for="order_D">由小到大</label>
+		    <input type="radio" id="order_A" name="order_direction" value="0" required="required"/><label for="order_A">由大到小</label><br>
+            <label for="page" >頁面</label><input id="page" name="page" type="number" value="0" min="0" style="width: 50px"></input>
+            <label for="limit">每頁</label><input type="number" id="limit" name="limit" value="100" min="0" style="width: 50px"></input><label>筆</label><br>
+            <input id="trigger" type="button" name="search" value="查詢"></input>
+        </form>
+    </div><br>
+
+    <div id="tbl_holder">
+        查詢結果會在這顯示...
+        <table id="albums">
+        </table>
+    </div>
+
+    <script>
+        autoUpdateSuggest(document.getElementById('name'), document.getElementById('name_data_list'), 'albums', 'albums_name');
+
+        document.getElementById("release_date").valueAsDate = new Date();
+        document.getElementById("trigger").addEventListener("click", function(event){
+            let form = new FormData();
+            let search_table = document.getElementById("table").value;
+            form.append("action_type", "select");
+            form.append("table", search_table);
+            if(search_table == "tracks"){//不用r_系列
+                form.append("display_columns", '["tracks_id","tracks_name", "artists_name", "albums_name", "release_date"]');
+                form.append("join", '["artists", "albums"]');
+            }
+            else if(search_table == "artists"){
+                form.append("display_columns", '["albums_id","artists_name", "albums_name", "release_date"]');
+                form.append("join", '["artists"]');
+            }
+            else{
+                form.append("display_columns", '["albums_id","albums_name", "artists_name", "release_date"]');
+                form.append("join", '["artists"]');
+            }
+
+            let d_date;
+            let date_value = document.getElementById("release_date").value;
+            if(document.getElementById("date_type").value == "after"){
+                d_date = '['+date_value+',]';
+            }
+            else if(document.getElementById("date_type").value == "between"){
+                let second_date = document.getElementById("s_date").value;
+                if(date_value > second_date){
+                    d_date = '['+second_date+','+ date_value+']';
+                }
+                else{
+                    d_date = '['+date_value+','+second_date+']';
+                }
+            }
+            else{
+                d_date = '[,'+document.getElementById("release_date").value+']';
+            }
+
+            if(document.getElementById("name").value!=''){
+                form.append("action_columns", JSON.stringify([search_table+'_name', "release_date"]));
+                form.append("values", JSON.stringify([document.getElementById("name").value, d_date]));
+            }
+            else if(search_table == "artists"){}//skip
+            else{
+                form.append("action_columns", JSON.stringify(["release_date"]));
+                form.append("values", JSON.stringify([d_date]));
+            }
+
+            if(document.getElementById("order").value != "0"){
+                form.append("order", document.getElementById("order").value);
+                form.append("order_direction", document.querySelector('form')['order_direction'].value);
+            }
+            form.append("page", Math.max(document.getElementById("page").value, 0));
+            form.append("limit", Math.max(document.getElementById("limit").value, 1));
+
+            //var test_txt = {"stat":1, "description":["id","albums_name", "artists_name", "release_date"], "rows":[["000","A", "art", "2023-11-21"],["001","B", "brt", "2023-11-20"]]};
+            //make_table(test_txt);
+            //check_form(form);
+
+            fetch("db_action.php", {
+                method: "POST",
+                body: form,
+            })
+            .then((res) => {
+                return res.json();
+            })
+            .then((txt) => {
+                console.log(txt);
+                make_table(txt);
+            });
+        })
+    </script>
+</body>
+</html>
