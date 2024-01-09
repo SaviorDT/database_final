@@ -26,8 +26,8 @@
             <label for="disc_number_max">~ </label><input type="number", name="disc_number_max" id="disc_number_max" value="1" min="1" max="127"></input><br>
             <label for="track_number_min">專輯中單曲數（0~32767）：</label><input type="number", name="track_number_min" id="track_number_min" value="1" min="1" max="32767"></input>
             <label for="track_number_max">~ </label><input type="number", name="track_number_max" id="track_number_max" value="1" min="1" max="32767"></input><br>
-            <label for="disc_duration_min">專輯長度（秒）：</label><input type="number", name="disc_duration_min" id="disc_duration_min" value="0" min="0" max="1e23-1"></input>
-            <label for="disc_duration_max">~ </label><input type="number", name="disc_duration_max" id="disc_duration_max" value="180" min="0" max="1e23-1"></input><br>
+            <label for="tracks_duration_min">專輯長度（秒）：</label><input type="number", name="tracks_duration_min" id="tracks_duration_min" value="0" min="0" max="1e23-1"></input>
+            <label for="tracks_duration_max">~ </label><input type="number", name="tracks_duration_max" id="tracks_duration_max" value="180" min="0" max="1e23-1"></input><br>
             <label for="explicit_lyrics">是否有露骨、暴力歌詞：</label>
                 <input type="radio" id="explicit" name="explicit_lyrics" value="1" required="required" checked/><label for="explicit">是</label>
 		        <input type="radio" id="no_explicit" name="explicit_lyrics" value="0" required="required"/><label for="no_explicit">否</label><br>
@@ -41,8 +41,9 @@
             <select id="order">
                 <option value="0">無</option>
                 <option value="name">名稱</option>
-                <option value="release_date">日期</option>
                 <option value="popularity">人氣</option>
+                <option value="track_duration">長度</option>
+                <option value="track_number">專輯單曲數</option>
             </select><br>
             <input type="radio" id="order_D" name="order_direction" value="1" required="required" checked/><label for="order_D">由小到大</label>
 		    <input type="radio" id="order_A" name="order_direction" value="0" required="required"/><label for="order_A">由大到小</label><br>
