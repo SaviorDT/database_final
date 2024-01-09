@@ -22,9 +22,9 @@
 
             <l>搜尋條件：（不填就用默認值囉）</l><br><!--action_columns-->
             <label for="name">單曲名稱：</label><input type="text" name="name" id="name" list="name_data_list"></input><datalist id="name_data_list"></datalist><br><!--tracks_name-->
-            <label for="disc_number_min">專輯中第幾號（0~127）：</label><input type="number", name="disc_number_min" id="disc_number_min" value="1" min="1" max="127"></input>
+            <label for="disc_number_min">專輯中唱片數（0~127）：</label><input type="number", name="disc_number_min" id="disc_number_min" value="1" min="1" max="127"></input>
             <label for="disc_number_max">~ </label><input type="number", name="disc_number_max" id="disc_number_max" value="1" min="1" max="127"></input><br>
-            <label for="track_number_min">專輯中單曲數（0~32767）：</label><input type="number", name="track_number_min" id="track_number_min" value="1" min="1" max="32767"></input>
+            <label for="track_number_min">專輯中單曲編號（0~32767）：</label><input type="number", name="track_number_min" id="track_number_min" value="1" min="1" max="32767"></input>
             <label for="track_number_max">~ </label><input type="number", name="track_number_max" id="track_number_max" value="1" min="1" max="32767"></input><br>
             <label for="tracks_duration_min">專輯長度（秒）：</label><input type="number", name="tracks_duration_min" id="tracks_duration_min" value="0" min="0" max="1e23-1"></input>
             <label for="tracks_duration_max">~ </label><input type="number", name="tracks_duration_max" id="tracks_duration_max" value="180" min="0" max="1e23-1"></input><br>
@@ -43,7 +43,7 @@
                 <option value="name">名稱</option>
                 <option value="popularity">人氣</option>
                 <option value="track_duration">長度</option>
-                <option value="track_number">專輯單曲數</option>
+                <!--<option value="disc_number">專輯唱片數</option>-->
             </select><br>
             <input type="radio" id="order_D" name="order_direction" value="1" required="required" checked/><label for="order_D">由小到大</label>
 		    <input type="radio" id="order_A" name="order_direction" value="0" required="required"/><label for="order_A">由大到小</label><br>
