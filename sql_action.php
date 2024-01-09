@@ -80,7 +80,9 @@ function selectSQL($tables, $action_columns, $values, $para, $display_columns) {
 	$select_command = getSelectCmd($tables, $action_columns, $values, $para, $display_columns);
 	
 	$stmt = $GLOBALS['link']->prepare($select_command[0]);
-	call_user_func_array([$stmt, 'bind_param'], $select_command[1]);
+	if(count($select_command[1]) >= 2) {
+		call_user_func_array([$stmt, 'bind_param'], $select_command[1]);
+	}
 	$stmt->execute();
 	$result = $stmt->get_result();
 	
@@ -88,12 +90,19 @@ function selectSQL($tables, $action_columns, $values, $para, $display_columns) {
 	mysqli_data_seek($result, 0);
 	$all_rows = $result->fetch_all();
 	
+	
 	$to_ret = [
-		'stat' => 1,
-		'description' => array_keys($fst_row),
-		'rows' => $all_rows,
-		'command' => $select_command[0]
+		'stat' => 0,
+		'description' => 'No match data.'
 	];
+	if($all_rows) {
+		$to_ret = [
+			'stat' => 1,
+			'description' => array_keys($fst_row),
+			'rows' => $all_rows,
+			// 'command' => $select_command[0]
+		];
+	}
 	
 	echo json_encode($to_ret);
 }

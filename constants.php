@@ -21,7 +21,7 @@ $text_like_columns = array_merge($text_columns, $id_columns, $foreign_id_columns
 $number_like_columns = array_merge($int_columns, $double_columns, $date_columns);
 
 $value_rules = [
-	'alumns_popularity' => [0,100],
+	'albums_popularity' => [0,100],
 	'artists_popularity' => [0,100],
 	'followers' => [0, PHP_INT_MAX],
 	'acousticness' => [0,1],

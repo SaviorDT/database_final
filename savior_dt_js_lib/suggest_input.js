@@ -6,7 +6,7 @@ function autoUpdateSuggest(input_field, datalist, table, column) {
         form_data.append('limit', 6);
         form_data.append('display_columns', JSON.stringify([column]));
         form_data.append('action_columns', JSON.stringify([column]));
-        form_data.append('values', JSON.stringify([input_field.value + '%']));
+        form_data.append('values', JSON.stringify(['%' + input_field.value + '%']));
         
         fetch('db_action.php', {
             method: "POST",
@@ -16,7 +16,12 @@ function autoUpdateSuggest(input_field, datalist, table, column) {
             return res.json();
         })
         .then((json) => {
-            updateSuggest(datalist, json.rows);
+            if(json.stat == 1) {
+                updateSuggest(datalist, json.rows);
+            }
+            else {
+                updateSuggest(datalist, []);
+            }
         })
     })
 }

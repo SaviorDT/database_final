@@ -42,7 +42,10 @@ function make_table(album_obj){
     //name first, then value
     let total_column = album_obj.description.length;
     let new_row = tbl.insertRow(-1);
-    for(let j=1;j<total_column;j++){
+    for(let j=0;j<total_column;j++){
+        if(album_obj.description[j].substr(-2) == 'id') {
+            continue;
+        }
         let new_cell = new_row.insertCell(-1);
         new_cell.innerHTML = album_obj.description[j];
     }
@@ -55,7 +58,10 @@ function make_table(album_obj){
     for(let i=0;i<row_length;i++){
         let new_row = tbl.insertRow(-1);
         new_row.id = album_obj.rows[i][0];
-        for(let j=1;j<total_column;j++){
+        for(let j=0;j<total_column;j++){
+            if(album_obj.description[j].substr(-2) == 'id') {
+                continue;
+            }
             let new_cell = new_row.insertCell(-1);
             new_cell.innerHTML = album_obj.rows[i][j];
         }

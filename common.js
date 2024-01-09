@@ -8,3 +8,12 @@ function check_form(form){
         console.log(pair[0]+ ', ' + pair[1]); 
     }
 }
+
+function autoChangeTable(menu) {
+    menu.addEventListener('change', function() {
+        let url = this.value;
+        if (url) {
+            window.location.href = 'search_' + url + '.html';
+        }
+    });
+}
