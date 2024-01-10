@@ -1,6 +1,6 @@
 function view_full(src){
     sessionStorage.setItem('ID', src.name);
-    window.open(encodeURI('./show_'+src.className.slice(0,-1)+'_detail.html?'+event.target.className+'_id='+event.target.name));
+    window.open(encodeURI('./show_'+src.className.slice(0,-1)+'_detail.html'));
 }
 
 function update_this(e, col_row, val_row){

@@ -127,6 +127,11 @@ function inSQL($table, $column, $value) {
 }
 
 function getInsertCmd($table, $columns, $values) {
+	if(in_array($table, $GLOBALS['id_tables'])) {
+		$columns []= $table.'_id';
+		$values []= substr(base64_encode(random_bytes(18)), 0, 22);
+	}
+
 	$int_columns = $GLOBALS['int_columns'];
 	$double_columns = $GLOBALS['double_columns'];
 	
@@ -192,6 +197,7 @@ function getUpdateCmd($table, $columns, $values) {
 }
 
 function getSelectCmd($tables, $action_columns, $values, $para, $display_columns) {
+
 	$sql_str = "SELECT ";
 	$para_type_str = "";
 	$para_vals = [&$para_type_str];
@@ -200,7 +206,7 @@ function getSelectCmd($tables, $action_columns, $values, $para, $display_columns
 		$sql_str = "SELECT *, ";
 	}
 	foreach($display_columns as $column) {
-		$sql_str .= $column.", ";
+		$sql_str .= "`".$column."`, ";
 	}
 	
 	

@@ -11,6 +11,7 @@ $table_columns = [
 	'tracks' => ['tracks_id', 'disc_number', 'tracks_duration', 'explicit', 'audio_feature_id', 'tracks_name', 'preview_url', 'track_number', 'tracks_popularity', 'is_playable']
 ];
 $text_columns = ['albums_name', 'album_group', 'album_type', 'artists_name', 'analysis_url', 'genres', 'tracks_name', 'preview_url'];
+$id_tables = ['albums', 'artists', 'audio_features', 'tracks'];
 $id_columns = ['albums_id', 'artists_id', 'audio_features_id', 'tracks_id'];
 $foreign_id_columns = ['audio_feature_id'];
 $int_columns = ['albums_popularity', 'artists_popularity', 'followers', 'audio_features_duration', 'key', 'mode', 'time_signature', 'disc_number', 'tracks_duration', 'explicit', 'track_number', 'tracks_popularity', 'is_playable'];

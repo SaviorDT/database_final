@@ -4,7 +4,7 @@
 	<title>track_details</title>
     <script src="common.js"></script>
     <script src="search_function.js"></script>
-    <script src="savior_dt_js_lib/suggest_input.js"></script>
+    <script src="savior_dt_js_lib/database_connector.js"></script>
 	<meta charset="utf-8">
 
     <style>
@@ -18,30 +18,97 @@
     </style>
 </head>
 <body>
-    <table class="track_table">
+    <table id="detail_table">
         <tr name="track_details_ch"><!--底下是亂填的-->
             <td name="track_name_ch">單曲名稱 track_name</td>
-            
-            <td name="audio_feature_ch">風格 audio_feature</td>
-            <td name="release_date_ch">發布日期 release_date</td>
             <td name="track_popularity_ch">人氣 track_popularity</td>
             <td name="duration_ch">長度 duration</td>
+            <td>兒少不宜 explicit</td>
         </tr>
-        <tr name="track_details">
-            <td name="track_name">Never gonna give you up</td>
-            <td name="audio_feature">meme</td>
-            <td name="release_date">1987</td>
-            <td name="track_popularity">100</td>
-            <td name="duration_ch">213</td>
+        <tr id="detail_row"></tr>
+    </table><br>
+    <table id="audio_feature_table">
+        <tr>
+            <td name="acousticness">原聲度</td>
+            <td name="danceability">舞蹈性</td>
+            <td name="energy">能量</td>
+            <td name="instrumentalness">樂器性</td>
+            <td name="key">音高</td>
+            <td name="liveness">現場感</td>
+            <td name="loudness">音量</td>
+            <td name="speechiness">說話性</td>
+            <td name="tempo">BPM</td>
+            <td name="time_signature">拍號</td>
+            <td name="valence">正能量</td>
         </tr>
-    </table>
-    <table name="audio_feature_table">
+    </table><br>
+    <table id="albums_table">
+        <tr>
+            <td name="track_artist_ch">所屬專輯</td>
+        </tr>
+    </table><br>
+    <table id="artists_table">
         <tr>
             <td name="track_artist_ch">樂團/創作者 track_artist</td>
         </tr>
-        <tr>
-            <td name="track_artist">Rick Astly</td>
-        </tr>
     </table>
 
+    <script>
+        async function waitPromises(promises) {
+            let results = [];
+            for(let p of promises) {
+                results.push((await p).rows);
+            }
+            return results;
+        }
+
+        async function main() {
+            let this_ID = sessionStorage.getItem('ID');
+            let details_promise = getDataWithID('tracks', this_ID, ['tracks_name', 'tracks_popularity', 'tracks_duration', 'explicit']);
+            let af_promise = getRelationByID('audio_features', 'tracks', this_ID, ["acousticness", "danceability", "energy", "instrumentalness", "key", "liveness", "loudness", "speechiness", "tempo", "time_signature", "valence"]);
+            let albums_promise = getRelationByID('albums', 'tracks', this_ID);
+            let artists_promise = getRelationByID('artists', 'tracks', this_ID);
+
+            let [details, audio_features, albums, artists] = await waitPromises([details_promise, af_promise, albums_promise, artists_promise]);
+
+            details = details[0];
+            details[3] = ['否', '是'][details[3]];
+            let details_row = document.getElementById('detail_row');
+            details_row.innerHTML = `<td>${details[0]}</td><td>${details[1]}</td><td>${details[2]}</td><td>${details[3]}</td>`;
+
+            if(audio_features) {
+                let table = document.getElementById('audio_feature_table');
+                for(let af of audio_features) {
+                    let new_row = table.insertRow(-1);
+                    for(let f of af) {
+                        let new_cell = new_row.insertCell(-1);
+                        new_cell.innerText = f;
+                    }
+                }
+            }
+            else {
+                document.getElementById('audio_feature_table').remove();
+            }
+
+            if(albums) {
+                let table = document.getElementById('albums_table');
+                for(let a of albums) {
+                    let new_row = table.insertRow(-1);
+                    let new_cell = new_row.insertCell(-1);
+                    new_cell.innerText = a[0];
+                }
+            }
+
+            if(artists) {
+                let table = document.getElementById('artists_table');
+                for(let a of artists) {
+                    let new_row = table.insertRow(-1);
+                    let new_cell = new_row.insertCell(-1);
+                    new_cell.innerText = a[0];
+                }
+            }
+        }
+
+        main();
+    </script>
 </body>

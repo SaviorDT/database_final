@@ -81,7 +81,7 @@ function checkSingleValValid($column, $value) {
 		//no need to check valid.
 	}
 	else if(in_array($column, $id_columns)) {
-		if(!preg_match("/^[0-9a-zA-Z]{22}$/i", $value)) {
+		if(!preg_match("/^[0-9a-zA-Z+\/,=-]{22}$/i", $value)) {
 			returnException($ccolumn."欄位傳入值為: ".$value."，應為僅包含英數且長度為22的字串");
 		}
 	}

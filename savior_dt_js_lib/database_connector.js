@@ -1,4 +1,4 @@
-function getRelationByID(target, source, this_ID, columns = null) {
+function getRelationByID(target, source, this_ID, columns = null, order_by = null) {
     let form_data = new FormData();
     form_data.append('action_type', 'select');
     form_data.append('table', source);
@@ -11,6 +11,9 @@ function getRelationByID(target, source, this_ID, columns = null) {
     }
     form_data.append('action_columns', JSON.stringify([source + '_id']));
     form_data.append('values', JSON.stringify([this_ID]));
+    if(order_by !== null) {
+        form_data.append('order', order_by);
+    }
     
     return fetch('db_action.php', {
         method: "POST",

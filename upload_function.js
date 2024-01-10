@@ -1,7 +1,9 @@
 var table_colums = {
-    "albums": [["專輯名稱", "創作者", "類型", "釋出日期"], ['<input type="text" name="albums_name"></input>', '<input type="text" name="artists"></input>', '<select name="album_type"><option value="single">single</option><option vlaue="album">album</option></select>', '<input type="date" name="release_date"></input>'], ['albums_name', 'artists_name', 'album_type', 'release_date']],
-    "tracks": [["單曲名稱", "所屬專輯", "長度", "", "釋出日期"], ['<input type="text" name="tracks_name"></input>', '<input type="text" name="albums_name"></input>', '<input type="number" name="tracks_duration" class="min"></input><lable>分</lable>', '<input type="number" name="tracks_duration" class="sec"></input><lable>秒</lable>', '<input type="date" name="release_date"></input>'], ['tracks_name', 'albums_name', 'tracks_duration', 'release_date']],
-    "artists": [["創作者名稱", "追蹤人數"], ['<input type="text" name="artists_name"></input>', '<input type="number" name="followers"></input>'], ['artists_name', 'followers']]
+    "albums": [["專輯名稱", "類型", "釋出日期", "知名度"], ['<input type="text" name="albums_name"></input>', '<input type="text" name="album_type"></input>', '<input type="date" name="release_date"></input>', '<input type="number" name="albums_popularity" min="0" max="100"></input>'], ['albums_name', 'album_type', 'release_date', 'albums_popularity']],
+    "tracks": [["單曲名稱", "所在唱片號", "長度(毫秒)", "是否兒童不宜", "預覽網址", "在唱片第幾首", "知名度", "能否播放"], 
+        ['<input type="text" name="tracks_name"></input>', '<input type="number" name="disc_number" min="1"></input>', '<input type="number" name="tracks_duration" min="0"></input>', '<input type="number" name="explicit" min="0" max="1"></input>', '<input type="text" name="preview_url"></input>', '<input type="number" name="track_number" min="0"></input>', '<input type="number" name="tracks_popularity" min="0" max="100"></input>', '<input type="number" name="is_playable" min="0" max="1"></input>'], 
+        ['tracks_name', 'disc_number', 'tracks_duration', 'explicit', 'preview_url', 'track_number', 'tracks_popularity', 'is_playable']],
+    "artists": [["創作者名稱", "知名度", "追蹤人數"], ['<input type="text" name="artists_name"></input>', '<input type="number" name="artists_popularity" min="0" max="100"></input>', '<input type="number" name="followers" min="0"></input>'], ['artists_name', 'artists_popularity', 'followers']]
 }
 
 function create_dbut(tbl){
@@ -53,36 +55,24 @@ function delete_table(e){
 
 //document.getElementById("0").rows[1].cells[0]
 function send_form(){
-    let form = new FormData();
-    form.append("action_type", "insert");
     let tbl_list = document.querySelectorAll(".insert");
     for(let i=0;i<tbl_list.length;i++){
+        let form = new FormData();
+        form.append("action_type", "insert");
         let current_table = tbl_list[i];
-        form.append("action_columns", JSON.stringify(table_colums[current_table.name][2]));
-        //form.append("table", current_table.name);
-        if(current_table.name == "albums"){
-            form.append("table", JSON.stringify(["albums", "artists"]));
-        }
-        else if(current_table.name == "tracks"){
-            form.append("table", JSON.stringify(["tracks", "albums"]));
-        }
-        else{
-            form.append("table", JSON.stringify(["artists"]));
-        }
+        form.append("table", current_table.name);
 
+        let columns = [];
         let values = [];
-        for(let j=0;j<table_colums[current_table.name][0].length;j++){
-            let cur_cell = current_table.rows[1].cells[j].children[0];
-            if(cur_cell.className == "min"){
-                values.push(60*cur_cell.value);
+        for(let cell of current_table.rows[1].cells){
+            let input = cell.children[0];
+            if(input.value == '') {
+                continue;
             }
-            else if(cur_cell.className == "sec"){
-                values[values.length-1] = parseInt(values[values.length-1]) + parseInt(cur_cell.value);
-            }
-            else{
-                values.push(cur_cell.value);
-            }
+            columns.push(input.name);
+            values.push(input.value);
         }
+        form.append("action_columns", JSON.stringify(columns));
         form.append("values", JSON.stringify(values));
         //check_form(form);
         fetch("db_action.php", {
@@ -93,7 +83,7 @@ function send_form(){
             return res.json();
         })
         .then((txt) => {
-            console.log(txt.stat);
+            console.log(txt);
         });
     }
 }

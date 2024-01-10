@@ -30,11 +30,10 @@
     <table id="tracks_table" >
         <tr name="album_track_ch">
             <td name="track_name_ch" colspan="2">收錄歌曲</td>
-            <td name="track_duration_ch">單曲長度</td>
         </tr>
     </table>
     <br>
-    <table id="artists">
+    <table id="artists_table">
         <tr name="album_group_ch">
             <td name="artist_name_ch" colspan="4">參與創作者</td>
         </tr>
@@ -52,7 +51,7 @@
         async function main() {
             let this_ID = sessionStorage.getItem('ID');
             let details_promise = getDataWithID('albums', this_ID);
-            let tracks_promise = getRelationByID('tracks', 'albums', this_ID);
+            let tracks_promise = getRelationByID('tracks', 'albums', this_ID, null, 'disc_number');
             let artists_promise = getRelationByID('artists', 'albums', this_ID);
 
             let [details, tracks, artists] = await waitPromises([details_promise, tracks_promise, artists_promise]);
