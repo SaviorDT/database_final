@@ -38,7 +38,10 @@ function insertSQL($table, $columns, $values) {
 	//table and columns and values should be checked.
 	$insert_command = getInsertCmd($table, $columns, $values);
 	$stmt = $GLOBALS['link']->prepare($insert_command[0]);
-	call_user_func_array([$stmt, 'bind_param'], $insert_command[1]);
+	
+	if(count($insert_command[1]) >= 2) {
+		call_user_func_array([$stmt, 'bind_param'], $insert_command[1]);
+	}
 	$stmt->execute();
 	$result = $GLOBALS['link']->affected_rows;
 	
@@ -63,7 +66,10 @@ function updateSQL($table, $ID, $columns, $values) {
 	$update_command[1][] = &$ID;
 	
 	$stmt = $GLOBALS['link']->prepare($update_command[0]);
-	call_user_func_array([$stmt, 'bind_param'], $update_command[1]);
+	
+	if(count($update_command[1]) >= 2) {
+		call_user_func_array([$stmt, 'bind_param'], $update_command[1]);
+	}
 	$stmt->execute();
 	$result = $GLOBALS['link']->affected_rows;
 	
@@ -78,7 +84,7 @@ function updateSQL($table, $ID, $columns, $values) {
 function selectSQL($tables, $action_columns, $values, $para, $display_columns) {
 	//table and columns and values should be checked.
 	$select_command = getSelectCmd($tables, $action_columns, $values, $para, $display_columns);
-	
+
 	$stmt = $GLOBALS['link']->prepare($select_command[0]);
 	if(count($select_command[1]) >= 2) {
 		call_user_func_array([$stmt, 'bind_param'], $select_command[1]);
@@ -208,7 +214,7 @@ function getSelectCmd($tables, $action_columns, $values, $para, $display_columns
 		else {
 			switch($table) {
 				case "genres":
-					$sql_str .= "JOIN r_artists_genres USING (genres) ";
+					$sql_str .= "JOIN r_artists_genres USING(artists_id) ";
 					break;
 				case "audio_features":
 					$sql_str .= "JOIN audio_features ON audio_features_id = audio_feature_id ";
