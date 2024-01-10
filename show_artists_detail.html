@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>artist_details</title>
+    <script src="common.js"></script>
+    <script src="search_function.js"></script>
+    <script src="savior_dt_js_lib/suggest_input.js"></script>
+	<meta charset="utf-8">
+
+    <style>
+        /*.artist_table{
+            border : 1px solid black
+        }*/
+        td{
+            /*border : 1px solid black*/
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <table class="artist_table">
+        <tr name="artist_details_ch"><!--底下是亂填的-->
+            <td name="artist_name_ch">創作者名稱 artist_name</td>
+            <td name="artist_popularity_ch">人氣 artist_popularity</td>
+            <td name="followers_ch">追蹤數 followers</td>
+        </tr>
+        <tr name="artist_details">
+            <td name="artist_name">Rick Astly</td>
+            <td name="artist_popularity_ch">100</td>
+            <td name="followers_ch">3,990,000</td>
+        </tr>
+        <tr name="artist_track_ch">
+            <td name="track_name_ch" colspan="2">參與作品</td>
+            <td name="release_date_ch">釋出日期</td>
+        </tr>
+        <tr name="artist_track">
+            <td name="track_name" colspan="2">never gonna give you up</td>
+            <td name="release_date" >1987</td>
+        </tr>
+    </table><br>
+    <table name="genres">
+        <tr></tr>
+            <td name="artist_genres_ch">流派 genres</td>
+        </tr>
+        <tr>
+        <td name="artist_genres_ch">meme</td>
+        </tr>
+    </table>
+
+</body>

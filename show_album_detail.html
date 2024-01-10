@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>album_details</title>
+    <script src="common.js"></script>
+    <script src="search_function.js"></script>
+    <script src="savior_dt_js_lib/suggest_input.js"></script>
+	<meta charset="utf-8">
+
+    <style>
+        /*.album_table{
+            border : 1px solid black
+        }*/
+        td{
+            /*border : 1px solid black*/
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <table class="album_table">
+        <tr name="album_details_ch"><!--底下是亂填的-->
+            <td name="album_name_ch">專輯名稱 album_name</td>
+            <td name="album_type_ch">類型 album_type</td>
+            <td name="release_date_ch">發布日期 release_date</td>
+            <td name="album_popularity_ch">人氣 album_popularity</td>
+        </tr>
+        <tr name="album_details"><!--底下是亂填的-->
+            <td name="album_name">Whenever You Need Somebody</td>
+            <td name="album_type">meme</td>
+            <td name="release_date">1987</td>
+            <td name="album_popularity">13,732,469</td>
+        </tr>
+    <!--</table>
+    <table name="tracks_table" >-->
+        <tr name="album_track_ch">
+            <td name="track_name_ch" colspan="2">收錄歌曲</td>
+            <td name="track_duration_ch">單曲長度</td>
+        </tr>
+        <tr name="album_track">
+            <td name="track_name" colspan="2">Never gonna give you up</td>
+            <td name="track_duration">213</td>
+        </tr>
+    </table>
+    <br>
+    <table name="artists">
+        <tr name="album_group_ch">
+            <td name="artist_name_ch" colspan="4">參與創作者</td>
+        </tr>
+        <tr name="album_group">
+            <td name="artist_name" colspan="4">Rick Astly</td>
+        </tr>
+    </table>
+
+</body>
