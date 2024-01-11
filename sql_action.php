@@ -16,13 +16,39 @@ if(!$link) {
 
 function deleteSQL($table, $ID) {
 	//table should be checked.
-	$cmd = "DELETE FROM $table WHERE {$table}_id = ?;";
-	if($table == "genres") {
-		$cmd = "DELETE FROM $table WHERE genres = ?;";
+	$cmd = "DELETE FROM $table";
+	$para_list = [""];
+
+	$where = " WHERE {$table}_id = ?;";
+	if($table[0] == "r") {
+		$tables = explode("_", $table);
+		if($tables[2] != "genres") {
+			$where = " WHERE {$tables[1]}_id = ? AND {$tables[2]}_id = ?;";
+		}
+		else {
+			$where = " WHERE {$tables[1]}_id = ? AND genres = ?;";
+		}
+		$IDs = explode(",", $ID);
+		
+		$cmd .= $where;
+		$para_list[0] .= "ss";
+		$para_list[] = &$IDs[0];
+		$para_list[] = &$IDs[1];
 	}
+	else {
+		if($table == "genres") {
+			$where = " WHERE genres = ?;";
+		}
+		$cmd .= $where;
+		$para_list[0] .= "s";
+		$para_list[] = &$ID;
+	}
+
+
 	
 	$stmt = $GLOBALS['link']->prepare($cmd);
-	$stmt->bind_param("s", $ID);
+	// $stmt->bind_param("s", $ID);
+	call_user_func_array([$stmt, 'bind_param'], $para_list);
 	$stmt->execute();
 	$result = $GLOBALS['link']->affected_rows;
 	
@@ -46,7 +72,7 @@ function insertSQL($table, $columns, $values) {
 	$result = $GLOBALS['link']->affected_rows;
 	
 	if($result > 0) {
-		returnSimpleSuccess("插入成功");
+		returnSimpleSuccess($insert_command[1][(count($insert_command[1]))-1]);
 	}
 	else {
 		returnException("插入欄位失敗。".$GLOBALS['link']->error, false);
@@ -58,12 +84,29 @@ function updateSQL($table, $ID, $columns, $values) {
 	$update_command = getUpdateCmd($table, $columns, $values);
 	
 	$where = " WHERE {$table}_id = ?;";
-	if($table == "genres") {
-		$where = " WHERE genres = ?;";
+	if($table[0] == "r") {
+		$tables = explode("_", $table);
+		if($tables[2] != "genres") {
+			$where = " WHERE {$tables[1]}_id = ? AND {$tables[2]}_id = ?;";
+		}
+		else {
+			$where = " WHERE {$tables[1]}_id = ? AND genres = ?;";
+		}
+		$IDs = explode(",", $ID);
+		
+		$update_command[0] .= $where;
+		$update_command[1][0] .= "ss";
+		$update_command[1][] = &$IDs[0];
+		$update_command[1][] = &$IDs[1];
 	}
-	$update_command[0] .= $where;
-	$update_command[1][0] .= "s";
-	$update_command[1][] = &$ID;
+	else {
+		if($table == "genres") {
+			$where = " WHERE genres = ?;";
+		}
+		$update_command[0] .= $where;
+		$update_command[1][0] .= "s";
+		$update_command[1][] = &$ID;
+	}
 	
 	$stmt = $GLOBALS['link']->prepare($update_command[0]);
 	
@@ -139,7 +182,7 @@ function getInsertCmd($table, $columns, $values) {
 	$values_str = "";
 	$para_type_str = "";
 	foreach($columns as $column) {
-		$columns_str .= $column.", ";
+		$columns_str .= "`".$column."`, ";
 		$values_str .= "?, ";
 		if(in_array($column, $int_columns)) {
 			$para_type_str .= "i";
@@ -174,7 +217,7 @@ function getUpdateCmd($table, $columns, $values) {
 	$para_type_str = "";
 	$para_vals = [&$para_type_str];
 	for($i=0; $i < count($columns); $i++) {
-		$sql_str .= " {$columns[$i]} = ?,";
+		$sql_str .= " `{$columns[$i]}` = ?,";
 		$para_vals[] = &$values[$i];
 		
 		if(in_array($columns[$i], $int_columns)) {

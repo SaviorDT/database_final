@@ -86,7 +86,7 @@ function checkSingleValValid($column, $value) {
 		}
 	}
 	else if(in_array($column, $foreign_id_columns)) {
-		if(!preg_match("/^[0-9a-zA-Z]{22}$/i", $value)) {
+		if(!preg_match("/^[0-9a-zA-Z+\/,=-]{22}$/i", $value)) {
 			returnException($column."欄位傳入值為: ".$value."，應為僅包含英數且長度為22的字串，如果想讓他null，直接不要把它放在action_columns裡面就好");
 		}
 		//for only one nullable foreign key in this database.

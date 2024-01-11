@@ -3,6 +3,35 @@ function view_full(src){
     window.open(encodeURI('./show_'+src.className.slice(0,-1)+'_detail.html'));
 }
 
+async function relate_this(src) {
+    if(sessionStorage.getItem("relate_1") == null) {
+        sessionStorage.setItem("relate_1", JSON.stringify([src.className, src.name]));
+        alert("請選擇另一個要連結的對象");
+    }
+    else {
+        let relate_1 = JSON.parse(sessionStorage.getItem("relate_1"));
+        sessionStorage.removeItem('relate_1');
+        if(src.className == relate_1[0]) {
+            alert("選擇同類型對象，無法建立連結");
+        }
+        else {
+            let tables = ["albums", "tracks", "artists"];
+            let table_str = "r";
+            for(let t of tables) {
+                if(t == relate_1[0] || t == src.className) {
+                    table_str += "_"+t;
+                }
+            }
+            if(await changeRelationTable(table_str, [relate_1[0]+"_id", src.className+"_id"], [relate_1[1], src.name])) {
+                alert("連結成功");
+            }
+            else {
+                alert("成功刪除連結");
+            }
+        }
+    }
+}
+
 function update_this(e, col_row, val_row){
     let ans = confirm("確定修改此欄位？一但修改便無法復原");
     if(ans){
@@ -17,7 +46,7 @@ function update_this(e, col_row, val_row){
         
         let columns = [];
         let values = [];
-        for(let item=0; item<col_row.length - 3; item++) {
+        for(let item=0; item<col_row.length - 4; item++) {
             columns.push(col_row[item].innerText);
             values.push(val_row[item].innerText);
         }
@@ -91,9 +120,11 @@ function make_table(album_obj){
     let view_but = new_row.insertCell(-1);
     let update_but = new_row.insertCell(-1);
     let delete_but = new_row.insertCell(-1);
+    let relate_but = new_row.insertCell(-1);
     view_but.innerHTML = "詳細資料";
     update_but.innerText = "更新";
     delete_but.innerHTML = "刪除";
+    relate_but.innerHTML = "新增或移除連結";
 
     let row_length = album_obj.rows.length;
     for(let i=0;i<row_length;i++){
@@ -115,9 +146,11 @@ function make_table(album_obj){
         let view_but = new_row.insertCell(-1);
         let update_but = new_row.insertCell(-1);
         let delete_but = new_row.insertCell(-1);
+        let relate_but = new_row.insertCell(-1);
         view_but.innerHTML = '<input type="button" class="'+document.getElementById("table").value+'" name="'+this_id+'" onclick="view_full(this)" value="view"></input>';
         update_but.innerHTML = '<input type="button" class="'+document.getElementById("table").value+'" name="'+this_id+'" onclick="update_this(this, document.getElementById(\'albums\').rows[0].cells, document.getElementById(\'albums\').rows['+(i+1)+'].cells)" value="update"></input>';
         delete_but.innerHTML = '<input type="button" class="'+document.getElementById("table").value+'" name="'+this_id+'" onclick="delete_this(this)" value="delete"></input>';
+        relate_but.innerHTML = '<input type="button" class="'+document.getElementById("table").value+'" name="'+this_id+'" onclick="relate_this(this)" value="relate"></input>';
     }
     document.getElementById("tbl_holder").appendChild(tbl);
 }

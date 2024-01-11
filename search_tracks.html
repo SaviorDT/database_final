@@ -6,6 +6,7 @@
     <script src="search_function.js"></script>
     <script src="savior_dt_js_lib/suggest_input.js"></script>
     <script src="savior_dt_js_lib/para_parser.js"></script>
+    <script src="savior_dt_js_lib/database_connector.js"></script>
 	<meta charset="utf-8">
 </head>
 
@@ -32,7 +33,7 @@
             <label for="disc_number_max">~ </label><input type="number", name="disc_number_max" id="disc_number_max" min="1" max="127"></input><br>
             <label for="track_number_min">專輯中單曲編號（0~32767）：</label><input type="number", name="track_number_min" id="track_number_min" min="1" max="32767"></input>
             <label for="track_number_max">~ </label><input type="number", name="track_number_max" id="track_number_max" min="1" max="32767"></input><br>
-            <label for="tracks_duration_min">專輯長度（秒）：</label><input type="number", name="tracks_duration_min" id="tracks_duration_min" min="0" max="1e23-1"></input>
+            <label for="tracks_duration_min">單曲長度（毫秒）：</label><input type="number", name="tracks_duration_min" id="tracks_duration_min" min="0" max="1e23-1"></input>
             <label for="tracks_duration_max">~ </label><input type="number", name="tracks_duration_max" id="tracks_duration_max" min="0" max="1e23-1"></input><br>
             <label for="explicit_lyrics">是否有露骨、暴力歌詞：</label>
                 <input type="radio" id="no_check_explicit" name="explicit_lyrics" value="-1" required="required" checked/><label for="no_check_explicit">不指定</label>

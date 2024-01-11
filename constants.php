@@ -1,9 +1,13 @@
 <?php
 $action_types = ['select', 'update', 'insert', 'delete'];
-$tables = ['albums', 'artists', 'audio_features', 'genres', 'r_albums_artists', 'r_albums_tracks', 'r_artist_genre', 'r_track_artist', 'tracks', 'test'];
+$tables = ['albums', 'artists', 'audio_features', 'genres', 'r_albums_artists', 'r_albums_tracks', 'r_artists_genres', 'r_tracks_artists', 'tracks', 'test'];
 $confusing_columns = ['id', 'name', 'popularity', 'duration'];
 $table_columns = [
 	'test' => ['ID', 'col'],
+	'r_artists_genres' => ['artists_id', 'genres'],
+	'r_albums_artists' => ['albums_id', 'artists_id'],
+	'r_albums_tracks' => ['albums_id', 'tracks_id'],
+	'r_tracks_artists' => ['tracks_id', 'artists_id'],
 	'albums' => ['albums_id', 'albums_name', 'album_group', 'album_type', 'release_date', 'albums_popularity'],
 	'artists' => ['artists_name', 'artists_id', 'artists_popularity', 'followers'],
 	'audio_features' => ['audio_features_id', 'acousticness', 'analysis_url', 'danceability', 'audio_features_duration', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 'time_signature', 'valence'],

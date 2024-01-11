@@ -5,6 +5,7 @@
     <script src="common.js"></script>
     <script src="search_function.js"></script>
     <script src="savior_dt_js_lib/database_connector.js"></script>
+    <script src="savior_dt_js_lib/suggest_input.js"></script>
 	<meta charset="utf-8">
 
     <style>
@@ -40,8 +41,12 @@
             <td name="artist_genres_ch">流派 genres</td>
         </tr>
     </table>
+    <input type="button" value="更新流派" id="update_genres" onclick="update_genres()"></input>
 
     <script>
+        var genres_list = [];
+        var this_ID = sessionStorage.getItem('ID');
+
         async function waitPromises(promises) {
             let results = [];
             for(let p of promises) {
@@ -51,7 +56,6 @@
         }
 
         async function main() {
-            let this_ID = sessionStorage.getItem('ID');
             let details_promise = getDataWithID('artists', this_ID);
             let tracks_promise = getRelationByID('tracks', 'artists', this_ID);
             let albums_promise = getRelationByID('albums', 'artists', this_ID);
@@ -81,16 +85,50 @@
                 }
             }
 
-            if(genres) {
-                let table = document.getElementById('genres_table');
-                for(let g of genres) {
-                    let new_row = table.insertRow(-1);
-                    let new_cell = new_row.insertCell(-1);
-                    new_cell.innerText = g[0];
-                }
+            if(!genres) {
+                genres = [];
+            }
+            genres.push(['']);
+            genres_list = genres;
+            let table = document.getElementById('genres_table');
+            for(let g of genres) {
+                let new_row = table.insertRow(-1);
+                let new_cell = new_row.insertCell(-1);
+                let data_list = document.createElement('datalist');
+                data_list.id = g[0] + "_data";
+                document.body.append(data_list);
+                new_cell.innerHTML = '<input type="text" name="genres_input" list="'+g[0]+'_data" value="'+g[0]+'"></input>';
+                autoUpdateSuggest(new_cell.children[0], data_list, 'genres', 'genres');
             }
         }
 
         main();
+
+        function update_genres() {
+            let genres_inputs = document.getElementsByName('genres_input');
+            if(genres_inputs.length != genres_list.length) {
+                console.log("length not same");
+                return;
+            }
+
+            for(let i=0; i<genres_list.length; i++) {
+                if(genres_inputs[i].value != genres_list[i][0]) {
+                    if(genres_list[i][0] != '') {
+                        if(genres_inputs[i].value == '') {
+                            deleteRelationTable('r_artists_genres', [this_ID ,genres_list[i][0]]);
+                        }
+                        else {
+                            updateRelationTable('r_artists_genres', [this_ID ,genres_list[i][0]], 'genres', genres_inputs[i].value);
+                        }
+                    }
+                    else {
+                        createData('genres', ['genres'], [genres_inputs[i].value]);
+                        createData('r_artists_genres', ['artists_id', 'genres'], [this_ID ,genres_inputs[i].value]);
+                    }
+                    alert("更新成功");
+                }
+                genres_list[i][0] = genres_inputs[i].value;
+            }
+        }
     </script>
 </body>

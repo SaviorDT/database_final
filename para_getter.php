@@ -26,7 +26,7 @@ function getActionType() {
 function getTable() {
 	$table = getPost('table');
 	if(!in_array($table, $GLOBALS['tables'])){
-		returnException("table wrong!");
+		returnException("table wrong!, ".$table." not exists.");
 	}
 	
 	return $table;

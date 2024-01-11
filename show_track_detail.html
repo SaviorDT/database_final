@@ -27,6 +27,7 @@
         </tr>
         <tr id="detail_row"></tr>
     </table><br>
+    <input type="button" value="更新唱片細節" onclick="update_audio_features()"></input>
     <table id="audio_feature_table">
         <tr>
             <td name="acousticness">原聲度</td>
@@ -54,6 +55,9 @@
     </table>
 
     <script>
+        var audio_feature_list = [];
+        var this_ID = sessionStorage.getItem('ID');
+
         async function waitPromises(promises) {
             let results = [];
             for(let p of promises) {
@@ -63,32 +67,36 @@
         }
 
         async function main() {
-            let this_ID = sessionStorage.getItem('ID');
             let details_promise = getDataWithID('tracks', this_ID, ['tracks_name', 'tracks_popularity', 'tracks_duration', 'explicit']);
             let af_promise = getRelationByID('audio_features', 'tracks', this_ID, ["acousticness", "danceability", "energy", "instrumentalness", "key", "liveness", "loudness", "speechiness", "tempo", "time_signature", "valence"]);
             let albums_promise = getRelationByID('albums', 'tracks', this_ID);
             let artists_promise = getRelationByID('artists', 'tracks', this_ID);
 
             let [details, audio_features, albums, artists] = await waitPromises([details_promise, af_promise, albums_promise, artists_promise]);
+            if(!audio_features) {
+                audio_features = [['','','','','','','','','','','']];
+            }
+            audio_feature_list = audio_features;
 
             details = details[0];
             details[3] = ['否', '是'][details[3]];
             let details_row = document.getElementById('detail_row');
             details_row.innerHTML = `<td>${details[0]}</td><td>${details[1]}</td><td>${details[2]}</td><td>${details[3]}</td>`;
 
-            if(audio_features) {
+            // if(audio_features) {
                 let table = document.getElementById('audio_feature_table');
                 for(let af of audio_features) {
                     let new_row = table.insertRow(-1);
                     for(let f of af) {
                         let new_cell = new_row.insertCell(-1);
                         new_cell.innerText = f;
+                        new_cell.setAttribute("contenteditable", "true");
                     }
                 }
-            }
-            else {
-                document.getElementById('audio_feature_table').remove();
-            }
+            // }
+            // else {
+            //     document.getElementById('audio_feature_table').remove();
+            // }
 
             if(albums) {
                 let table = document.getElementById('albums_table');
@@ -110,5 +118,53 @@
         }
 
         main();
+
+        async function update_audio_features() {
+            let af_inputs = document.getElementById('audio_feature_table').rows[1].cells;
+            if(af_inputs.length != audio_feature_list[0].length) {
+                console.log("length not same");
+                return;
+            }
+
+            let col_list = ["acousticness", "danceability", "energy", "instrumentalness", "key", "liveness", "loudness", "speechiness", "tempo", "time_signature", "valence"];
+            let upload_af = [];
+            let upload_val = [];
+            for(let i=0; i<audio_feature_list[0].length; i++) {
+                if(audio_feature_list[0][i] == null) {
+                    audio_feature_list[0][i] = '';
+                }
+                if(af_inputs[i].innerText != audio_feature_list[0][i]) {
+                    upload_af.push(col_list[i]);
+                    if(af_inputs[i].innerText == '') {
+                        upload_val.push(null);
+                    }
+                    else {
+                        upload_val.push(af_inputs[i].innerText);
+                    }
+                }
+                audio_feature_list[0][i] = af_inputs[i].innerText;
+            }
+
+            let aid = (await getDataWithID('tracks', this_ID, ['audio_feature_id'])).rows[0][0];
+            if(aid == null) {
+                aid = (await createData('audio_features', upload_af, upload_val)).description;
+                let res = await updateData('tracks', this_ID, ['audio_feature_id'], [aid]);
+                if(res.stat == 1) {
+                    alert("修改成功");
+                }
+                else {
+                    alert("修改失敗: "+res.description);
+                }
+            }
+            else {
+                let res = await updateData('audio_features', aid, upload_af, upload_val);
+                if(res.stat == 1) {
+                    alert("修改成功");
+                }
+                else {
+                    alert("修改失敗: "+res.description);
+                }
+            }
+        }
     </script>
 </body>
